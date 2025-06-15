@@ -51,7 +51,7 @@ Default dimensions are 1024x1024, if you forget to set it up ember will automati
 ## Compatibility
 
 - **Client-side only**
-- Works with all Roblox-supported platforms: PC, mobile, console
+- Works with all Roblox-supported platforms: PC, mobile, console and VR
 - Does not require any third-party libraries
 
 ## License
