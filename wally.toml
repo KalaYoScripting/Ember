@@ -1,6 +1,6 @@
 [package]
 name = "kalayoscripting/ember"
-version = "0.1.1"
+version = "0.1.2"
 description = "Powerful and highly optimized 2D particle system for Roblox, built to simulate ParticleEmitter behavior within GUI elements."
 authors = ["kalata/fartfella/kalabgs"]
 registry = "https://github.com/UpliftGames/wally-index"
