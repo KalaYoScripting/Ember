@@ -1,7 +1,4 @@
 # Ember
-yesterday
-
-Update README.md
 Ember is a powerful and highly optimized 2D particle system for Roblox, built to simulate ParticleEmitter behavior within GUI elements.
 
 # Features
