@@ -109,7 +109,7 @@ local ParticlesGUI = Instance.new("ScreenGui")
 ParticlesGUI.DisplayOrder = 5
 ParticlesGUI.Name = "Particles"
 ParticlesGUI.Parent = LocalPlayer.PlayerGui
-
+ParticlesGUI.ScreenInsets = Enum.ScreenInsets.None
 
 --// Tables //--
 
