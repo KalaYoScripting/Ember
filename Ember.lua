@@ -1,6 +1,7 @@
 --// Properties //--
 
 local ALERT_ABOUT_FLIPBOOK_DIMENSIONS = true
+local REDUCE_RATE_BY_QUALITY = true
 local DELTA_TIME = nil -- leave nil if you want to use user framerate
 
 --// Types //--
@@ -65,7 +66,6 @@ local EMITTER_PROPERTIES = {
 }
 
 local DIMENSIONS_ARRAY = {8, 16, 32, 64, 128, 256, 512, 1024}
-local FLIPBOOK_DIMENSIONS_ATTRIBUTENAME = "FLIPBOOK_DIMENSIONS"
 
 local EMISSION_DIRECTION: {[Enum.NormalId]: number} = {
 	[Enum.NormalId.Left] = 0,
@@ -239,6 +239,18 @@ local function getFrameFromFlipbook(dimensions: number, layout: number, frame: n
 	return Vector2.new(offsetX, offsetY), Vector2.new(frameSize, frameSize)
 end
 
+local function createParticleEmitterFromTable(emitterData: ParticleEmitter)
+	local emitter = Instance.new("ParticleEmitter")
+	
+	for property, value in emitterData do
+		if not table.find(EMITTER_PROPERTIES, property) then continue end
+		
+		emitter[property] = value
+	end
+	
+	return emitter
+end
+
 --// Main functions //--
 
 local function DestroyParticleReference(particleReference: ParticleReference)
@@ -294,7 +306,7 @@ local function RenderParticles(dt: number)
 		local acceleration = emitterProperties.Acceleration
 		local accX = acceleration.X / cameraX * t * t * 20
 		local accY = acceleration.Y / cameraY * t * t * 20
-		
+
 		local actualSpeed = drag and speed * (0.5 ^ (t / drag)) or speed
 		local newPosition = particle.position + UDim2.fromScale(
 			direction.X.Scale * actualSpeed * t - accX,
@@ -421,6 +433,10 @@ end
 
 --// Module functions //--
 
+function Ember.createFromTable(struct : ParticleEmitter & {EmitPosition: Vector2?}) : ParticleEmitter2D	
+	return Ember.new(createParticleEmitterFromTable(struct), struct.EmitPosition)
+end
+
 function Ember.new(particleEmitter: ParticleEmitter, emitPosition: UDim2?) : ParticleEmitter2D
 	if CachedEmitters2D[particleEmitter] then return CachedEmitters2D[particleEmitter] end
 	if ALERT_ABOUT_FLIPBOOK_DIMENSIONS and particleEmitter.FlipbookLayout ~= Enum.ParticleFlipbookLayout.None then
@@ -466,16 +482,21 @@ function Ember.new(particleEmitter: ParticleEmitter, emitPosition: UDim2?) : Par
 	}
 
 	local variableSetFunctions = {
-		Enabled = function(_, enabled: boolean?)
+		Enabled = function(enabled: boolean?)
 			enabled = enabled or particleEmitter.Enabled
 
 			if enabled and not emitParticlesThread then
 				emitParticlesThread = task.spawn(function()
 					while true do
-						local qualityLevel = UserGameSettings.SavedQualityLevel.Value
-						local rateReduction = qualityLevel == 0 and .5 or qualityLevel/10
-						local rate = particleEmitter.Rate * rateReduction
-
+						local rate = particleEmitter.Rate
+						
+						if REDUCE_RATE_BY_QUALITY then
+							local qualityLevel = UserGameSettings.SavedQualityLevel.Value
+							local rateReduction = qualityLevel == 0 and .5 or qualityLevel/10
+							
+							rate *= rateReduction
+						end
+						
 						for _ = 1, math.max(rate, 1) do
 							if particleEmitter.Parent:IsA("GuiObject") then
 								EmitInParent(particleEmitter, particleLabel, particleEmitter.Parent)
@@ -573,7 +594,7 @@ function Ember.new(particleEmitter: ParticleEmitter, emitPosition: UDim2?) : Par
 			Particles[particleEmitter] = nil
 			EmitterProperties[particleEmitter] = nil
 			CachedEmitters2D[particleEmitter] = nil
-			
+
 			table.clear(variableSetFunctions)
 			table.clear(variableGetFunctions)
 			table.clear(uiParticleEmitter)
@@ -611,9 +632,9 @@ function Ember.new(particleEmitter: ParticleEmitter, emitPosition: UDim2?) : Par
 	destroyedParticle = particleEmitter.Destroying:Connect(uiParticleEmitter.Destroy)
 
 	variableSetFunctions.Enabled(particleEmitter.Enabled)
-	
+
 	CachedEmitters2D[particleEmitter] = uiParticleEmitter
-	
+
 	return uiParticleEmitter
 end
 
