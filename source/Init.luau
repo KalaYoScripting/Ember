@@ -29,8 +29,8 @@ type ParticleReference = {
 	drag: number,
 	speed: number,
 	rotSpeed: number,
-	size: Udim2,
-	direction: Udim2,
+	size: UDim2,
+	direction: UDim2,
 	position: UDim2?,
 
 	currentFrame: number?,
