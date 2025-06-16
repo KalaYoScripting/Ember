@@ -464,7 +464,7 @@ function Ember.new(particleEmitter: ParticleEmitter, emitPosition: UDim2?) : Par
 	local destroyedParticle: RBXScriptConnection
 	local propertyChanged: RBXScriptConnection
 
-	local uiParticleEmitter: UIParticleEmitter
+	local uiParticleEmitter: ParticleEmitter2D
 
 	RecycledParticles[particleEmitter] = RecycledParticles[particleEmitter] or {}
 	Particles[particleEmitter] = Particles[particleEmitter] or {}
